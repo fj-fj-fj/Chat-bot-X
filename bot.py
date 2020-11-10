@@ -1,6 +1,7 @@
 import re
 
-from utils import tinput, print
+from utils import print
+from utils import tinput
 
 
 pattern = r'((?!\n)\s+)'
@@ -97,8 +98,8 @@ class ChatLogic:
 
     @staticmethod
     def hello_null():
-        no_sound = INTENTIONS["hello_null"]
-        can_u_repeat = f'{ChatLogic._indent}{no_sound}\n'
+        no_voice = INTENTIONS["hello_null"]
+        can_u_repeat = f'{ChatLogic._indent}{no_voice}\n'
         return tinput(can_u_repeat)
 
     # ---------------  HangupLogic:  -----------------------
@@ -116,7 +117,7 @@ class ChatLogic:
     def hangup_wrong_time(confirm=None, wrong_time=None):
         sorry_bye = INTENTIONS["hangup_wrong_time"]
         print(sorry_bye)
-        return bye
+        return sorry_bye
 
     @staticmethod
     def hangup_null():
@@ -166,13 +167,15 @@ class ChatLogic:
     
     @staticmethod
     def recommend_null():
-        intention = INTENTIONS["recommend_null"]
-        pass
+        no_voice = INTENTIONS["recommend_null"]
+        please_repeat = f'{ChatLogic._indent}{no_voice}\n'
+        return tinput(please_repeat)
 
     @staticmethod
     def recommend_default():
-        intention = INTENTIONS["recommend_default"]
-        pass
+        dont_be_silent = INTENTIONS["recommend_default"]
+        print(dont_be_silent)
+        return dont_be_silent
 
 
 class Bot(ChatLogic):

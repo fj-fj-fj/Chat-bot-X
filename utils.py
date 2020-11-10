@@ -1,4 +1,6 @@
+import traceback
 import builtins
+import inspect
 import msvcrt
 import time
 import sys
@@ -34,5 +36,44 @@ def print(*args, **kwargs):
     builtins.print('\a>\t>\t>\t', *args, **kwargs)
 
 
+def get_current_fname():
+    current_frame = inspect.currentframe()
+    previous_frame = current_frame.f_back
+    current_name = previous_frame.f_code.co_name
+    return current_name
+
+
+def get_func_name():
+    current_frame = inspect.currentframe()
+    previous_frame = current_frame.f_back.f_back
+    func_bot_name = previous_frame.f_code.co_name
+    return func_bot_name
+
+
+def inspect_func():
+    print(inspect.stack())
+
+
+def f_name():
+    return traceback.extract_stack(None, 2)[0][2]
+
+    
 if __name__ == '__main__':
-    pass
+    def foo():
+        return None, None
+
+    x, *y = foo()
+    print(x)
+    print(y)
+
+
+    def ft_join(lst, sep=' '):
+        s = '%s' % lst
+        ss = ''
+        for i in s:
+            if i.isdigit():
+                ss += i + sep
+            else:
+                continue
+
+    ft_join([1,2,3])
