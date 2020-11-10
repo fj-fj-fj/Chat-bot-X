@@ -1,8 +1,7 @@
 import sys
 
 from bot import Bot
-from utils import get_func_name
-from utils import inspect_func
+from utils import log
 
 
 if sys.stdout.encoding == 'cp1251':
@@ -10,86 +9,138 @@ if sys.stdout.encoding == 'cp1251':
 
 
 bot = Bot('Вадим')
-# флаг для повторных звоноков:
-repeated = False
+
+# if IN: есть тут кто?; and OUT: [eerie grunting]:
+default = bot.recommend_main, bot.recommend_default
 
 goto = {
-    True: bot.hello_null,
-    False: bot.hangup_null, 
-    'да': bot.recommend_main, 
-    'нет': bot.hangup_wrong_time,
+    'null': {
+        'hello_null': bot.hello_null,
+        'recommend_null': bot.recommend_null, 
+        'hangup_null': bot.hangup_null
+    },
+    'да': {
+        'recommend_main': bot.recommend_main,
+        'recommend_score_positive': bot.recommend_score_positive
+    },
+    'нет': {
+        'hangup_wrong_time': bot.hangup_wrong_time,
+        'recommend_score_negative': bot.recommend_score_negative
+    },
     'занят': bot.hangup_wrong_time,
-    'еще раз': bot.hello_repeat
+    'не знаю': bot.recommend_repeat_2,
+    'возможно': bot.recommend_score_neutral,
+    'еще раз': {
+        'hello_repeat': bot.hello_repeat, 
+        'recommend_repeat': bot.recommend_repeat
+    },
+    'bad': [range(9), bot.hangup_negative],
+    'good': [range(9, 11), bot.hangup_positive],
+    'exit': [
+        'hangup_null', 'hangup_positive',
+        'hangup_negative','hangup_wrong_time',
+    ]
 }
 
-# IN: есть тут кто?;  OUT: [eerie grunting]
-default = bot.recommend_main
-
-
-def start():
-    # пробуем установить связь:
-    response = bot.say_hello()
-    while response is None:
-        # юзер молчит и повторный звонок еще не был совершен
-        # воспользуемся флагом повтора:
-        second_time = cur_state(response)
-        print('-----1', second_time)
-        # 2й звонок (null или иное):
-        response = trying_to_chat(second_time)
-        print('----------2', response)
-    # есть контакт!
-    response = connect_continue(clean_data(response))
-    while response is not None:
-        print('----------------3', response)
-        response = connect_continue(clean_data(response))
-
-
-def cur_state(response):
-    print('from cur_state')
-    if response is None:
-        global repeated
-        repeated = True if not repeated else False
-        return repeated
-
-
-def trying_to_chat(response):
-    print('from trying_to_chat')
-    func = goto.get(response, default)
-    connect = func.__name__ != 'hangup_null'
-    print('*****1', func.__name__)
-    if not connect:
-        # если не задалось, заканчиваем монолог:
-        print('**********2', connect)
-        raise sys.exit(f'{func()}')
-    print('***************3')
-    return func()
-
-
 def clean_data(response):
-    # очистимся
-    print('clean_data')
     if isinstance(response, int):
         response = str(response)
     return response.lower().strip()
 
 
-def connect_continue(response):
-    print('from connect_continue')
-    func = goto.get(response, default)
-    response = func()
+def get_current_logic():
+    global default
+    if bot.HELLOLOGIC:
+        default_ = default[0]
+    elif bot.MAINLOGIC:
+        default_ = default[1]
+    return default_
+
+
+def score_on_a_scale_of_1_to_10(n):
+    good = goto.get('good')
+    bad = goto.get('bad')
+
+    if int(n) in good[0]:
+        func = good[1]
+    elif int(n) in bad[0]:
+        func = bad[1]
+    return func
+
+
+def start():
+    print('\v\v')
+    response = bot.say_hello()
+
     while response is None:
-        # молчит... воспользуемся флагом повтора:
-        second_time = cur_state(response)
-        # и переспросим:
-        response = trying_to_chat(second_time)
-    wrong_time = func.__name__ == 'hangup_wrong_time'
-    if wrong_time:
-        raise sys.exit()
-    print('no exit')
+        response = trying_to_chat(response)
+
+    response = connect_continue(clean_data(response))
+
+    while response is not None:
+        response = connect_continue(clean_data(response))
+
+
+def trying_to_chat(response):
+    print(log[0].format(response))
+    user_null = response is None
+
+    if user_null:
+        # юзер молчит, проверим, был ли повторный звонок
+        bot.repeated = True if not bot.repeated else False
+    ask_again = bot.repeated
+
+    # игнор; main/hello логика; попытка связаться:
+    if user_null and bot.HELLOLOGIC and ask_again:
+        func = goto['null']['hello_null']
+    elif user_null and bot.MAINLOGIC and ask_again:
+        func = goto['null']['recommend_null']
+    elif user_null and (bot.HELLOLOGIC or bot.MAINLOGIC) and not ask_again:
+        func = goto['null']['hangup_null']
+
+    connect = func.__name__ not in goto['exit']
+    print(log[1].format(func.__name__))
+
+    if not connect: func(); raise sys.exit()
+    return func()
+
+
+def connect_continue(response):
+    print(log[2].format(response))
+
+    # проверим, есть ли ответ юзера в нашем списке юзерских фраз:
+    coincidence = any(list(filter(lambda x: x == response, list(goto.keys()))))
+
+    try:
+        if bot.HELLOLOGIC and coincidence:
+            key = list(goto.get(response).keys())[0]
+
+        elif bot.MAINLOGIC and (coincidence or response.isdigit()):
+            # проверим сразу на наличие оценки:
+            if response.isdigit():
+                if int(response) in range(11):
+                    end = score_on_a_scale_of_1_to_10(response)()
+                    raise sys.exit()
+
+            key = list(goto.get(response).keys())[1]
+
+        default = get_current_logic()
+        func = goto[response].get(key, default)
+    except (KeyError, AttributeError):
+        default = get_current_logic()
+        func = goto.get(response, default)
+    response = func()
+
+    while response is None:
+        # молчит... мы переспросим:
+        response = trying_to_chat(response)
+
+    wrong_time = func.__name__ in goto['exit']
+    if wrong_time: raise sys.exit()
+
     return response
 
 
 if __name__ == '__main__':
     # main()
     start()
-    print('^^^^^^^^^^^^  end   ^^^^^^^^^^^^^^^')

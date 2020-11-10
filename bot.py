@@ -48,7 +48,7 @@ INTENTIONS = {
     "recommend_repeat":
 
             re.sub(pattern, ' ', """Как бы вы оценили возможность порекомендовать нашу компанию своим знакомым по шкале от 0 до 10, 
-            где 0 - точно не порекомендую, 10 - обязательно порекомендую."""),
+            где 0 - точно не порекомендую, 10 - обязательно порекомендую?"""),
 
     "recommend_repeat_2":
 
@@ -65,7 +65,7 @@ INTENTIONS = {
 
     "recommend_score_positive":
 
-            "Хорошо,  а по 10-ти бальной шкале как бы вы оценили 8-9 или может 10?",
+            "Хорошо, а по 10-ти бальной шкале как бы вы оценили 8-9 или может 10?",
 
     "recommend_null":
 
@@ -81,23 +81,32 @@ INTENTIONS = {
 
 class ChatLogic:
 
-    _indent = '\a>\t>\t>\t'
+    HELLOLOGIC = False
+    MAINLOGIC = False
+    repeated = False
+    _indent = '\a\N{Robot Face}\t>>\t>>>\t'
 
     # ---------------  HelloLogic:  -----------------------
     @staticmethod
     def say_hello():
+        ChatLogic.MAINLOGIC = False
+        ChatLogic.HELLOLOGIC = True
         introduction = INTENTIONS["hello"]
         can_u_talk = f'{ChatLogic._indent}{introduction}\n'
         return tinput(can_u_talk)
 
     @staticmethod
     def hello_repeat(repeat=None):
+        ChatLogic.MAINLOGIC = False
+        ChatLogic.HELLOLOGIC = True
         this_is_me = INTENTIONS["hello_repeat"]
         can_u_talk = f'{ChatLogic._indent}{this_is_me}\n'
         return tinput(can_u_talk)
 
     @staticmethod
     def hello_null():
+        ChatLogic.MAINLOGIC = False
+        ChatLogic.HELLOLOGIC = True
         no_voice = INTENTIONS["hello_null"]
         can_u_repeat = f'{ChatLogic._indent}{no_voice}\n'
         return tinput(can_u_repeat)
@@ -105,13 +114,15 @@ class ChatLogic:
     # ---------------  HangupLogic:  -----------------------
     @staticmethod
     def hangup_positive():
-        intention = INTENTIONS["hangup_positive"]
-        pass
+        great_bye = INTENTIONS["hangup_positive"]
+        print(great_bye)
+        return great_bye
     
     @staticmethod
     def hangup_negative():
-        intention = INTENTIONS["hangup_negative"]
-        pass
+        bad_bye = INTENTIONS["hangup_negative"]
+        print(bad_bye)
+        return bad_bye
     
     @staticmethod
     def hangup_wrong_time(confirm=None, wrong_time=None):
@@ -136,46 +147,67 @@ class ChatLogic:
     # ---------------  MainLogic:  -----------------------
     @staticmethod
     def recommend_main(confirm=None):
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
         ask_question = INTENTIONS["recommend_main"]
-        rate_us = f'{ChatLogic._indent}{ask_question}\n'
-        return tinput(rate_us)
+        rate_me = f'{ChatLogic._indent}{ask_question}\n'
+        return tinput(rate_me)
 
     @staticmethod
     def recommend_repeat():
-        intention = INTENTIONS["recommend_repeat"]
-        pass
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        ask_repeat = INTENTIONS["recommend_repeat"]
+        rate_me = f'{ChatLogic._indent}{ask_repeat}\n'
+        return tinput(rate_me)
 
     @staticmethod
     def recommend_repeat_2():
-        intention = INTENTIONS["recommend_repeat_2"]
-        pass
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        ask_repeat_2 = INTENTIONS["recommend_repeat_2"]
+        rate_me = f'{ChatLogic._indent}{ask_repeat_2}\n'
+        return tinput(rate_me)
 
     @staticmethod
     def recommend_score_negative():
-        intention = INTENTIONS["recommend_score_negative"]
-        pass
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        obsession = INTENTIONS["recommend_score_negative"]
+        obsession = f'{ChatLogic._indent}{obsession}\n'
+        return tinput(obsession)
     
     @staticmethod
     def recommend_score_neutral():
-        intention = INTENTIONS["recommend_score_neutral"]
-        pass
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        persistence = INTENTIONS["recommend_score_neutral"]
+        persistence = f'{ChatLogic._indent}{persistence}\n'
+        return tinput(persistence)
     
     @staticmethod
     def recommend_score_positive():
-        intention = INTENTIONS["recommend_score_positive"]
-        pass
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        rate_me = INTENTIONS["recommend_score_positive"]
+        insert_scale = f'{ChatLogic._indent}{rate_me}\n'
+        return tinput(insert_scale)
     
     @staticmethod
     def recommend_null():
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
         no_voice = INTENTIONS["recommend_null"]
         please_repeat = f'{ChatLogic._indent}{no_voice}\n'
         return tinput(please_repeat)
 
     @staticmethod
     def recommend_default():
-        dont_be_silent = INTENTIONS["recommend_default"]
-        print(dont_be_silent)
-        return dont_be_silent
+        ChatLogic.HELLOLOGIC = False
+        ChatLogic.MAINLOGIC = True
+        repeat = INTENTIONS["recommend_default"]
+        please = f'{ChatLogic._indent}{repeat}\n'
+        return tinput(please)
 
 
 class Bot(ChatLogic):
@@ -183,3 +215,7 @@ class Bot(ChatLogic):
     def __init__(self, name='', data={}):
         self.name = name if name else f'{name}, '
         self.data = data
+
+
+if __name__ == '__main__':
+    bot = Bot('Chapa')
