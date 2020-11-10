@@ -34,6 +34,7 @@ goto = {
         'hello_repeat': bot.hello_repeat, 
         'recommend_repeat': bot.recommend_repeat
     },
+    '?': bot.forward,
     'bad': [range(9), bot.hangup_negative],
     'good': [range(9, 11), bot.hangup_positive],
     'exit': [
@@ -129,6 +130,9 @@ def connect_continue(response):
     except (KeyError, AttributeError):
         default = get_current_logic()
         func = goto.get(response, default)
+    
+    # entyty_value(если надо ...)
+    
     response = func()
 
     while response is None:
@@ -144,3 +148,17 @@ def connect_continue(response):
 if __name__ == '__main__':
     # main()
     start()
+
+# def entity_value():
+    # response = func(repeat=True) if response == 'еще раз'
+    # response = func(wrong_time=True) if response == 'занят'
+    # response = func(confirm=True) if bot.HELLOLOGIC else func()
+    # response = func(confirm=False) if bot.HELLOLOGIC and response == 'нет'
+    # response = func(recommendation_score=[0..8]) if response == '0-8'
+    # response = func(recommendation_score=[9..10]) if response == '9-10'
+    # response = func(recommendation=negative) if bot.MAINLOGIC and response == 'нет'
+    # response = func(recommendation=positive) if bot.MAINLOGIC and response == 'да'
+    # response = func(recommendation=neutral) if bot.MAINLOGIC and response == 'возможно'
+    # response = func(repeat=True) if bot.MAINLOGIC and response == 'еще раз'
+    # response = func(recommendation=dont_now) if bot.MAINLOGIC and response == 'не знаю'
+    # response = func(question=True) if response == '?'
