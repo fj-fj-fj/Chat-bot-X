@@ -11,7 +11,7 @@ pattern = r'((?!\n)\s+)'
 INTENTIONS = {
     "hello":
 
-            re.sub(pattern, ' ', """добрый день! Вас беспокоит компания X, мы проводим опрос 
+            re.sub(pattern, ' ', """{},  добрый день! Вас беспокоит компания X, мы проводим опрос 
             удовлетворенности нашими услугами. Подскажите, вам удобно сейчас говорить?"""),
 
     "hello_repeat":
@@ -87,21 +87,24 @@ class ChatLogic:
     repeated = False
     _indent = '\a\N{Robot Face}\t>>\t>>>\t'
 
+    # def __init__(self, name):
+    #     self.name = name
+
     # ---------------  HelloLogic:  -----------------------
     @staticmethod
-    def say_hello():
+    def say_hello(name):
         ChatLogic.MAINLOGIC = False
         ChatLogic.HELLOLOGIC = True
         hello = INTENTIONS["hello"]
-        hello = f'{ChatLogic._indent}{hello}\n'
-        return tinput(hello)
+        hello = f'{ChatLogic._indent}{hello}\n\n'
+        return tinput(hello.format(name))
 
     @staticmethod
     def hello_repeat(repeat=None):
         ChatLogic.MAINLOGIC = False
         ChatLogic.HELLOLOGIC = True
         re_ask = INTENTIONS["hello_repeat"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n'
+        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
         return tinput(re_ask)
 
     @staticmethod
@@ -109,7 +112,7 @@ class ChatLogic:
         ChatLogic.MAINLOGIC = False
         ChatLogic.HELLOLOGIC = True
         see_you = INTENTIONS["hello_null"]
-        see_you = f'{ChatLogic._indent}{see_you}\n'
+        see_you = f'{ChatLogic._indent}{see_you}\n\n'
         return tinput(see_you)
 
     # ---------------  HangupLogic:  -----------------------
@@ -149,7 +152,7 @@ class ChatLogic:
     @staticmethod
     def forward(question=None):
         wait_skin = INTENTIONS["forward"]
-        stay_on_line = f'{ChatLogic._indent}{wait_skin}\n'
+        stay_on_line = f'{ChatLogic._indent}{wait_skin}\n\n'
         print(stay_on_line)
         return stay_on_line
         # yield stay_on_line
@@ -161,7 +164,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         rate_me = INTENTIONS["recommend_main"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n'
+        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
         return tinput(rate_me)
 
     @staticmethod
@@ -169,7 +172,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         rate_me = INTENTIONS["recommend_repeat"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n'
+        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
         return tinput(rate_me)
 
     @staticmethod
@@ -177,7 +180,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         rate_me = INTENTIONS["recommend_repeat_2"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n'
+        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
         return tinput(rate_me)
 
     @staticmethod
@@ -185,7 +188,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         obsession = INTENTIONS["recommend_score_negative"]
-        obsession = f'{ChatLogic._indent}{obsession}\n'
+        obsession = f'{ChatLogic._indent}{obsession}\n\n'
         return tinput(obsession)
     
     @staticmethod
@@ -193,7 +196,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         persistence = INTENTIONS["recommend_score_neutral"]
-        persistence = f'{ChatLogic._indent}{persistence}\n'
+        persistence = f'{ChatLogic._indent}{persistence}\n\n'
         return tinput(persistence)
     
     @staticmethod
@@ -201,7 +204,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         rate_me = INTENTIONS["recommend_score_positive"]
-        insert_scale = f'{ChatLogic._indent}{rate_me}\n'
+        insert_scale = f'{ChatLogic._indent}{rate_me}\n\n'
         return tinput(insert_scale)
     
     @staticmethod
@@ -209,7 +212,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         re_ask = INTENTIONS["recommend_null"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n'
+        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
         return tinput(re_ask)
 
     @staticmethod
@@ -217,7 +220,7 @@ class ChatLogic:
         ChatLogic.HELLOLOGIC = False
         ChatLogic.MAINLOGIC = True
         re_ask = INTENTIONS["recommend_default"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n'
+        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
         return tinput(re_ask)
 
 
@@ -228,7 +231,7 @@ class Connect(ChatLogic):
         return response.lower().strip()
 
 
-    def get_current_logic(self) -> callable:
+    def get_current_defolt(self) -> callable:
         """self.HELLOLOGIC -> return recommend_main
            self.MAINLOGIC -> return recommend_default
         """
@@ -261,11 +264,9 @@ class Connect(ChatLogic):
         user_null = response is None
 
         if user_null:
-            # юзер молчит, проверим, был ли повторный звонок
             self.repeated = True if not self.repeated else False
         re_ask = self.repeated
 
-        # Если игнор & <main/hello>логика & повторить вопрос:
         if user_null and self.HELLOLOGIC and re_ask:
             func = goto['null']['hello_null']
         elif user_null and self.MAINLOGIC and re_ask:
@@ -277,6 +278,7 @@ class Connect(ChatLogic):
         print(log[1].format(func.__name__))
 
         if not connect: func(); raise sys.exit()
+
         return func()
     
 
@@ -286,6 +288,7 @@ class Connect(ChatLogic):
         
         """
         print(log[2].format(response))
+        response = Bot.clean_data(response)
 
         # проверим, есть ли ответ юзера в нашем списке юзерских фраз:
         coincidence = any(list(filter(lambda x: x == response, list(goto.keys()))))
@@ -295,48 +298,38 @@ class Connect(ChatLogic):
                 key = list(goto.get(response).keys())[0]
 
             elif self.MAINLOGIC and (coincidence or response.isdigit()):
-                # проверим сразу на наличие оценки:
-                if response.isdigit():
-                    if int(response) in range(11):
-                        end = self.score_on_a_scale_of_1_to_10(response)()
+                
+                if response.isdigit() and int(response) in range(11):
+                        self.score_on_a_scale_of_1_to_10(response)()
                         raise sys.exit()
 
                 key = list(goto.get(response).keys())[1]
 
-            default = self.get_current_logic()
+            default = self.get_current_defolt()
             func = goto[response].get(key, default)
 
         except (KeyError, AttributeError):
-            default = self.get_current_logic()
+            default = self.get_current_defolt()
             func = goto.get(response, default)
         
         # entyty_value(если надо ...)
         
         response = func()
 
-        while response is None:
-            # молчит... мы переспросим:
-            response = self.trying_to_chat(response)
-
         wrong_time = func.__name__ in goto['exit']
-
         if wrong_time: raise sys.exit()
 
         return response
 
 
 class Bot(Connect):
+    
+    def say_hello(self, name):
+        super().say_hello(name.capitalize())
 
-    def __init__(self, name='', data={}):
-        self.name = name if name else f'{name}, '
-        self.data = data
 
 
-# объект бота для goto:
 bot = Bot
-
-# if IN: есть тут кто?; and OUT: [eerie grunting]:
-default = bot.recommend_main, bot.recommend_default
 
 goto = {
     'null': {
@@ -367,13 +360,15 @@ goto = {
         'hangup_negative','hangup_wrong_time',
     ]
 }
+# if IN: есть тут кто?; and OUT: [eerie grunting]:
+default = bot.recommend_main, bot.recommend_default
 
 
 if __name__ == '__main__':
     bot = Bot('Chapa')
 
 
-
+# ---------------  Entity/Value  -----------------------
 # def entity_value():
     # response = func(repeat=True) if response == 'еще раз'
     # response = func(wrong_time=True) if response == 'занят'

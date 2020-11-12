@@ -59,9 +59,4 @@ log = {
 
 
 if __name__ == '__main__':
-    def foo():
-        return None, None
-
-    x, *y = foo()
-    print(x)
-    print(y)
+    pass
