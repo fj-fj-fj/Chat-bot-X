@@ -33,7 +33,7 @@ def tinput(caption, timeout=7):
 
 
 def print(*args, **kwargs):
-    builtins.print('\a\N{Robot Face}\t>>\t>>>\t', *args, **kwargs)
+    builtins.print('\n\a\N{Robot Face}\t>>\t>>>\t', *args, **kwargs)
 
 
 def get_fname():
@@ -53,8 +53,8 @@ def f_name():
 
 log = {
     0: '\n:: Связь установить не удалось; response: {}'.rjust(100, '~'),
-    1: ':: {} function run',
-    2: '\n:: маппинг функций и ответов: {}\n'.rjust(100, '~')
+    1: '\n:: {} function run',
+    2: '\n:: маппинг функций и ответа; response: {}\n'.rjust(100, '~')
 }
 
 

@@ -7,7 +7,7 @@ if sys.stdout.encoding == 'cp1251':
     sys.stdout.reconfigure(encoding='utf-8')
 
 
-name = 'Вадим'
+name = input('To test me, enter your name: ')
 
 def main():
     print('\v\v')

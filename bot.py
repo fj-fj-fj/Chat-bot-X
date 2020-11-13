@@ -59,7 +59,7 @@ INTENTIONS = {
 
     "recommend_score_negative":
 
-            "Ну а от 0 до 10 как бы вы оценили бы: 0, 5 или может 7 ?",
+            "Ну а от 0 до 10 как бы вы оценили бы: 0, 5, или может, 7 ?",
 
     "recommend_score_neutral":
 
@@ -85,10 +85,7 @@ class ChatLogic:
     HELLOLOGIC = False
     MAINLOGIC = False
     repeated = False
-    _indent = '\a\N{Robot Face}\t>>\t>>>\t'
-
-    # def __init__(self, name):
-    #     self.name = name
+    _indent = '\n\a\N{Robot Face}\t>>\t>>>\t'
 
     # ---------------  HelloLogic:  -----------------------
     @staticmethod
@@ -231,7 +228,7 @@ class Connect(ChatLogic):
         return response.lower().strip()
 
 
-    def get_current_defolt(self) -> callable:
+    def get_current_defаlt(self) -> callable:
         """self.HELLOLOGIC -> return recommend_main
            self.MAINLOGIC -> return recommend_default
         """
@@ -247,11 +244,7 @@ class Connect(ChatLogic):
         good = goto.get('good')
         bad = goto.get('bad')
 
-        if int(n) in good[0]:
-            func = good[1]
-        elif int(n) in bad[0]:
-            func = bad[1]
-        return func
+        return bad if int(n) in range(9) else good
 
 
     def trying_to_chat(self, response) -> callable:
@@ -260,7 +253,7 @@ class Connect(ChatLogic):
                 exit if it was
         
         """
-        print(log[0].format(response))
+        # print(log[0].format(response))
         user_null = response is None
 
         if user_null:
@@ -275,7 +268,7 @@ class Connect(ChatLogic):
             func = goto['null']['hangup_null']
 
         connect = func.__name__ not in goto['exit']
-        print(log[1].format(func.__name__))
+        # print(log[1].format(func.__name__))
 
         if not connect: func(); raise sys.exit()
 
@@ -287,7 +280,7 @@ class Connect(ChatLogic):
            if rated: exit; if null: re-ask
         
         """
-        print(log[2].format(response))
+        # print(log[2].format(response))
         response = Bot.clean_data(response)
 
         # проверим, есть ли ответ юзера в нашем списке юзерских фраз:
@@ -305,11 +298,11 @@ class Connect(ChatLogic):
 
                 key = list(goto.get(response).keys())[1]
 
-            default = self.get_current_defolt()
+            default = self.get_current_defаlt()
             func = goto[response].get(key, default)
 
         except (KeyError, AttributeError):
-            default = self.get_current_defolt()
+            default = self.get_current_defаlt()
             func = goto.get(response, default)
         
         # entyty_value(если надо ...)
@@ -353,8 +346,8 @@ goto = {
         'recommend_repeat': bot.recommend_repeat
     },
     '?': bot.forward,
-    'bad': [range(9), bot.hangup_negative],
-    'good': [range(9, 11), bot.hangup_positive],
+    'bad': bot.hangup_negative,
+    'good': bot.hangup_positive,
     'exit': [
         'hangup_null', 'hangup_positive',
         'hangup_negative','hangup_wrong_time',
