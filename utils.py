@@ -10,7 +10,7 @@ def fwindows(s):
     return s.encode('utf-8','replace').decode('cp1251', 'ignore')
 
 
-def tinput(caption, timeout=7):
+def time_input(caption, timeout=7):
     def echo(c):
         sys.stdout.write(c)
         sys.stdout.flush()        

@@ -1,14 +1,12 @@
 import re
 import sys
 
-from utils import print
-from utils import tinput
-from utils import log
+from utils import time_input
 
 
 pattern = r'((?!\n)\s+)'
 
-INTENTIONS = {
+BOT_PHRASES = {
     "hello":
 
             re.sub(pattern, ' ', """{},  добрый день! Вас беспокоит компания X, мы проводим опрос 
@@ -40,7 +38,7 @@ INTENTIONS = {
 
     "forward": 
 
-            "Чтобы разобраться в вашем вопросе, я переключу звонок на моих коллег. Пожалуйста оставайтесь на линии.",
+            "Чтобы разобраться в вашем вопросе, я переключу звонок на моих коллег. Пожалуйста оставайтесь на линии.  ♫•*¨*•.¸¸♪",
 
     "recommend_main":
 
@@ -79,299 +77,175 @@ INTENTIONS = {
 
 }
 
-
-class ChatLogic:
-
-    HELLOLOGIC = False
-    MAINLOGIC = False
-    repeated = False
-    _indent = '\n\a\N{Robot Face}\t>>\t>>>\t'
-
-    # ---------------  HelloLogic:  -----------------------
-    @staticmethod
-    def say_hello(name):
-        ChatLogic.MAINLOGIC = False
-        ChatLogic.HELLOLOGIC = True
-        hello = INTENTIONS["hello"]
-        hello = f'{ChatLogic._indent}{hello}\n\n'
-        return tinput(hello.format(name))
-
-    @staticmethod
-    def hello_repeat(repeat=None):
-        ChatLogic.MAINLOGIC = False
-        ChatLogic.HELLOLOGIC = True
-        re_ask = INTENTIONS["hello_repeat"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
-        return tinput(re_ask)
-
-    @staticmethod
-    def hello_null():
-        ChatLogic.MAINLOGIC = False
-        ChatLogic.HELLOLOGIC = True
-        see_you = INTENTIONS["hello_null"]
-        see_you = f'{ChatLogic._indent}{see_you}\n\n'
-        return tinput(see_you)
-
-    # ---------------  HangupLogic:  -----------------------
-    @staticmethod
-    def hangup_positive(recommendation_score=None):
-        hangup = INTENTIONS["hangup_positive"]
-        print(hangup)
-        return hangup
-        # yield hangup
-        # other hangup action ...
-    
-    @staticmethod
-    def hangup_negative(recommendation_score=None):
-        hangup = INTENTIONS["hangup_negative"]
-        print(hangup)
-        return hangup
-        # yield hangup
-        # other hangup action ...
-    
-    @staticmethod
-    def hangup_wrong_time(confirm=None, wrong_time=None):
-        hangup = INTENTIONS["hangup_wrong_time"]
-        print(hangup)
-        return hangup
-        # yield hangup
-        # other hangup action ...
-
-    @staticmethod
-    def hangup_null():
-        ill_be_back = INTENTIONS["hangup_null"]
-        print(ill_be_back, end='\N{Winking Face}\n')
-        return ill_be_back
-        # yield ill_bi_back
-        # other hangup action ...
-
-    # ---------------  ForwardLogic:  -----------------------
-    @staticmethod
-    def forward(question=None):
-        wait_skin = INTENTIONS["forward"]
-        stay_on_line = f'{ChatLogic._indent}{wait_skin}\n\n'
-        print(stay_on_line)
-        return stay_on_line
-        # yield stay_on_line
-        # other bring action ...
-    
-    # ---------------  MainLogic:  -----------------------
-    @staticmethod
-    def recommend_main(confirm=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        rate_me = INTENTIONS["recommend_main"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
-        return tinput(rate_me)
-
-    @staticmethod
-    def recommend_repeat(repeat=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        rate_me = INTENTIONS["recommend_repeat"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
-        return tinput(rate_me)
-
-    @staticmethod
-    def recommend_repeat_2(repeat=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        rate_me = INTENTIONS["recommend_repeat_2"]
-        rate_me = f'{ChatLogic._indent}{rate_me}\n\n'
-        return tinput(rate_me)
-
-    @staticmethod
-    def recommend_score_negative(recommendation=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        obsession = INTENTIONS["recommend_score_negative"]
-        obsession = f'{ChatLogic._indent}{obsession}\n\n'
-        return tinput(obsession)
-    
-    @staticmethod
-    def recommend_score_neutral(recommendation=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        persistence = INTENTIONS["recommend_score_neutral"]
-        persistence = f'{ChatLogic._indent}{persistence}\n\n'
-        return tinput(persistence)
-    
-    @staticmethod
-    def recommend_score_positive(recommendation=None):
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        rate_me = INTENTIONS["recommend_score_positive"]
-        insert_scale = f'{ChatLogic._indent}{rate_me}\n\n'
-        return tinput(insert_scale)
-    
-    @staticmethod
-    def recommend_null():
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        re_ask = INTENTIONS["recommend_null"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
-        return tinput(re_ask)
-
-    @staticmethod
-    def recommend_default():
-        ChatLogic.HELLOLOGIC = False
-        ChatLogic.MAINLOGIC = True
-        re_ask = INTENTIONS["recommend_default"]
-        re_ask = f'{ChatLogic._indent}{re_ask}\n\n'
-        return tinput(re_ask)
+goto = {
+    'null': {
+        'hello_null': BOT_PHRASES.get('hello_null'),
+        'recommend_nul': BOT_PHRASES.get('recommend_null'), 
+        'hangup_null': BOT_PHRASES.get('hangup_null')
+    },
+    'да': {
+        'recommend_main': BOT_PHRASES.get('recommend_main'),
+        'recommend_score_positive': BOT_PHRASES.get('recommend_score_positive')
+    },
+    'нет': {
+        'hangup_wrong_time': BOT_PHRASES.get('hangup_wrong_time'),
+        'recommend_score_negative': BOT_PHRASES.get('recommend_score_negative')
+    },
+    'занят': BOT_PHRASES.get('hangup_wrong_time'),
+    'не знаю': BOT_PHRASES.get('recommend_repeat_2'),
+    'возможно': BOT_PHRASES.get('recommend_score_neutral'),
+    'еще раз': {
+        'hello_repeat': BOT_PHRASES.get('hello_repeat'), 
+        'recommend_repeat': BOT_PHRASES.get('recommend_repeat')
+    },
+    '?': BOT_PHRASES.get('forward'),
+    'bad': BOT_PHRASES.get('hangup_negative'),
+    'good': BOT_PHRASES.get('hangup_positive'),
+    'exit': [
+        'hangup_null', 'hangup_positive',
+        'hangup_negative','занят',
+    ]
+}
+# in: hey? out: [CROWLING AND SCREAMING]:
+default = BOT_PHRASES.get('recommend_main'), BOT_PHRASES.get('recommend_default')
 
 
-class Connect(ChatLogic):
+class Chat:
+    """This class contains the logic of communication with the user
 
-    @staticmethod
+            __init__
+            :self._hlogic: (bool) True if say_hello, hello_null, hello_repeat
+            :self._mlogic: (bool) True for all other logic
+            :self._repeated: (bool) ask again a second time or hengup_null run
+    """
+
+    def __init__(self):
+        self._hlogic = True
+        self._mlogic = False
+        self._repeated = False
+
+
+    @staticmethod 
     def clean_data(response):
         return response.lower().strip()
 
 
-    def get_current_defаlt(self) -> callable:
-        """self.HELLOLOGIC -> return recommend_main
-           self.MAINLOGIC -> return recommend_default
+    def say_hello(self, name):
+        """<user name>, BOT_PHRASES['hello']"""
+        hello = BOT_PHRASES["hello"]
+        hello = self.format_text(hello)
+        return time_input(hello.format(name))
+
+
+    def format_text(self, phrase):
+        """beep 🤖   >>  >>>    <bot phrase>"""
+        return f'\n\a\N{Robot Face}\t>>\t>>>\t{phrase}\n\n'
+
+
+    def check_repeat(self):
+        """re-ask or hangup_null"""
+        self._repeated = True if not self._repeated else False
+        return self._repeated
+
+
+    def check_pattern(self, response):
+        """response in goto.keys()"""
+        return any(list(filter(lambda x: x == response, list(goto.keys()))))
+
+
+    def set_current_logic(self, is_pattern):
+        """ :self._hlogic: (bool) True if say_hello, hello_null, hello_repeat
+            :self._mlogic: (bool) True for all other logic
         """
 
-        return default[0 if self.HELLOLOGIC else 1]
+        if is_pattern in ('нет', 'занят', 'еще раз'): return
+        self._hlogic, self._mlogic = self._mlogic, self._hlogic
 
 
-    def score_on_a_scale_of_1_to_10(self, n) -> callable:
-        """ User: [0...8] Bot: hangup_negative
-            User: [9..10] Bot: hangup_positive
-            
+    def get_current_defаlt(self):
+        """self._hlogic -> return recommend_main
+           self._mlogic -> return recommend_default
         """
+        return default[0 if self._hlogic else 1]
+
+
+    def check_exit(self, response, key='foo'):
+        """hangup logic"""
+        return any(map(lambda w: w in goto['exit'], (key, response))) 
+
+
+    def score_on_a_scale_of_1_to_10(self, n):
+        """ rate: hangup_negative <- [0..8..10] -> hangup_positive"""
         good = goto.get('good')
         bad = goto.get('bad')
 
         return bad if int(n) in range(9) else good
 
 
-    def trying_to_chat(self, response) -> callable:
+    def trying_to_chat(self, response):
         """User is None:
                 re-ask if not asked
                 exit if it was
         
         """
-        # print(log[0].format(response))
-        user_null = response is None
+        re_ask = self.check_repeat()
 
-        if user_null:
-            self.repeated = True if not self.repeated else False
-        re_ask = self.repeated
-
-        if user_null and self.HELLOLOGIC and re_ask:
-            func = goto['null']['hello_null']
-        elif user_null and self.MAINLOGIC and re_ask:
-            func = goto['null']['recommend_null']
-        elif user_null and (self.HELLOLOGIC or self.MAINLOGIC) and not re_ask:
-            func = goto['null']['hangup_null']
-
-        connect = func.__name__ not in goto['exit']
-        # print(log[1].format(func.__name__))
-
-        if not connect: func(); raise sys.exit()
-
-        return func()
+        if self._hlogic and re_ask:
+            phrase = goto['null']['hello_null']
+        elif not self._hlogic and re_ask:
+            phrase = goto['null']['recommend_nul']
+        elif not re_ask:
+            phrase = goto['null']['hangup_null']
+            raise sys.exit(self.format_text(phrase))
+        return time_input(self.format_text(phrase))
     
 
-    def connect_continue(self, response) -> callable:
+    def chat_continue(self, response):
         """If user replied: goto: {response: function};
            if rated: exit; if null: re-ask
         
         """
-        # print(log[2].format(response))
         response = Bot.clean_data(response)
-
-        # проверим, есть ли ответ юзера в нашем списке юзерских фраз:
-        coincidence = any(list(filter(lambda x: x == response, list(goto.keys()))))
+        is_pattern = self.check_pattern(response)
 
         try:
-            if self.HELLOLOGIC and coincidence:
+            if self._hlogic and is_pattern:
                 key = list(goto.get(response).keys())[0]
+                self.set_current_logic(response)
 
-            elif self.MAINLOGIC and (coincidence or response.isdigit()):
+            elif self._mlogic and (is_pattern or response.isdigit()):
                 
                 if response.isdigit() and int(response) in range(11):
-                        self.score_on_a_scale_of_1_to_10(response)()
-                        raise sys.exit()
+                        hungup = self.score_on_a_scale_of_1_to_10(response)
+                        raise sys.exit(self.format_text(hungup))
 
                 key = list(goto.get(response).keys())[1]
 
             default = self.get_current_defаlt()
-            func = goto[response].get(key, default)
+            phrase = goto[response].get(key, default)
 
         except (KeyError, AttributeError):
             default = self.get_current_defаlt()
-            func = goto.get(response, default)
-        
-        # entyty_value(если надо ...)
-        
-        response = func()
+            phrase = goto.get(response, default)
 
-        wrong_time = func.__name__ in goto['exit']
-        if wrong_time: raise sys.exit()
+        wrong_time = self.check_exit(response)
+        if wrong_time: 
+            raise sys.exit(self.format_text(phrase))
 
-        return response
+        return time_input(self.format_text(phrase))
 
 
-class Bot(Connect):
+class Bot(Chat):
     
     def say_hello(self, name):
-        super().say_hello(name.capitalize())
-
-
-
-bot = Bot
-
-goto = {
-    'null': {
-        'hello_null': bot.hello_null,
-        'recommend_null': bot.recommend_null, 
-        'hangup_null': bot.hangup_null
-    },
-    'да': {
-        'recommend_main': bot.recommend_main,
-        'recommend_score_positive': bot.recommend_score_positive
-    },
-    'нет': {
-        'hangup_wrong_time': bot.hangup_wrong_time,
-        'recommend_score_negative': bot.recommend_score_negative
-    },
-    'занят': bot.hangup_wrong_time,
-    'не знаю': bot.recommend_repeat_2,
-    'возможно': bot.recommend_score_neutral,
-    'еще раз': {
-        'hello_repeat': bot.hello_repeat, 
-        'recommend_repeat': bot.recommend_repeat
-    },
-    '?': bot.forward,
-    'bad': bot.hangup_negative,
-    'good': bot.hangup_positive,
-    'exit': [
-        'hangup_null', 'hangup_positive',
-        'hangup_negative','hangup_wrong_time',
-    ]
-}
-# if IN: есть тут кто?; and OUT: [eerie grunting]:
-default = bot.recommend_main, bot.recommend_default
+        return super().say_hello(name.capitalize())
 
 
 if __name__ == '__main__':
     bot = Bot('Chapa')
 
 
-# ---------------  Entity/Value  -----------------------
-# def entity_value():
-    # response = func(repeat=True) if response == 'еще раз'
-    # response = func(wrong_time=True) if response == 'занят'
-    # response = func(confirm=True) if bot.HELLOLOGIC else func()
-    # response = func(confirm=False) if bot.HELLOLOGIC and response == 'нет'
-    # response = func(recommendation_score=[0..8]) if response == '0-8'
-    # response = func(recommendation_score=[9..10]) if response == '9-10'
-    # response = func(recommendation=negative) if bot.MAINLOGIC and response == 'нет'
-    # response = func(recommendation=positive) if bot.MAINLOGIC and response == 'да'
-    # response = func(recommendation=neutral) if bot.MAINLOGIC and response == 'возможно'
-    # response = func(repeat=True) if bot.MAINLOGIC and response == 'еще раз'
-    # response = func(recommendation=dont_now) if bot.MAINLOGIC and response == 'не знаю'
-    # response = func(question=True) if response == '?'
+# при текущей "реализации", каждый раз при входных данных типа default,
+# робот будет оставатся в петле hello_logic и возвращать recommend_main
+
+# слишком раздутый event loop
