@@ -1,3 +1,5 @@
+""" initial draft, hasty naming, Windows needles, etc """
+
 import re
 import sys
 
