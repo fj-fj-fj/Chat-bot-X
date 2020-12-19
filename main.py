@@ -1,17 +1,12 @@
-import sys
-
-# from protobot import Bot
 from bot import Bot
+from utils import set_utf8_if_cp
 
 
-if sys.stdout.encoding == 'cp1251':
-    sys.stdout.reconfigure(encoding='utf-8')
+set_utf8_if_cp()
 
 name = input('To test me, enter your name: ')
 
 def main():
-    print('\v\v')
-
     bot = Bot()
     response = bot.say_hello(name)
 
@@ -23,6 +18,6 @@ def main():
         while response is not None:
             response = bot.chat_continue(response)
 
-
 if __name__ == '__main__':
     main()
+ 

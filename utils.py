@@ -6,7 +6,7 @@ import time
 import sys
 
 
-def fwindows():
+def set_utf8_if_cp():
     """cp1251 -> utf-8"""
     if sys.stdout.encoding == 'cp1251':
         sys.stdout.reconfigure(encoding='utf-8')
