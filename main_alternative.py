@@ -15,57 +15,24 @@
     func: chat - processes the human response
         
 """
-# в объект `goto` добавлены перечисления, для оснований следующего действия бота
-import sys
-from enum import Enum
 
-from INTERACTION import interaction
+import sys
+
+from INTERACTION import BOT_PHRASES, Logic, goto
 from utils import time_input, set_utf8_if_cp
 
 
 set_utf8_if_cp()
 
-BOT_PHRASES = interaction.bot_phrases
-
-Logic = Enum('Logic', 'HANGUP HELLO MAIN', start=0)
-
-goto = {
-    'null': {
-        1: (BOT_PHRASES.get('hello_null'), Logic.HELLO.value),
-        2: (BOT_PHRASES.get('recommend_null'), Logic.MAIN.value),
-        None: (BOT_PHRASES.get('hangup_null'), Logic.HANGUP.value)
-    },
-    'да': {
-        1: (BOT_PHRASES.get('recommend_main'), Logic.MAIN.value),
-        2: (BOT_PHRASES.get('recommend_score_positive'), Logic.MAIN.value)
-    },
-    'нет': {
-        1: (BOT_PHRASES.get('hangup_wrong_time'), Logic.HANGUP.value),
-        2: (BOT_PHRASES.get('recommend_score_negative'), Logic.MAIN.value)
-    },
-    'занят': (BOT_PHRASES.get('hangup_wrong_time'), Logic.HANGUP.value),
-    'не знаю': (BOT_PHRASES.get('recommend_repeat_2'), Logic.MAIN.value),
-    'возможно': (BOT_PHRASES.get('recommend_score_neutral'), Logic.MAIN.value),
-    'еще раз': {
-        1: (BOT_PHRASES.get('hello_repeat'), Logic.HELLO.value),
-        2: (BOT_PHRASES.get('recommend_repeat'), Logic.MAIN.value)
-    },
-    '?': (BOT_PHRASES.get('forward'), Logic.MAIN.value),  # nlu
-    'bad': (BOT_PHRASES.get('hangup_negative'), Logic.HANGUP.value),
-    'good': (BOT_PHRASES.get('hangup_positive'), Logic.HANGUP.value),
-    'default': {
-        1: (BOT_PHRASES.get('recommend_main'), Logic.MAIN.value),
-        2: (BOT_PHRASES.get('recommend_default'), Logic.MAIN.value)
-    }
-}
-
 logic = Logic.HELLO.value
 
 repeat = False
 
+
 def say_hello(name):
     hello = BOT_PHRASES["hello"]
     return time_input(hello.format(name.capitalize()))
+
 
 def chat(response):
     """Processes the human response.

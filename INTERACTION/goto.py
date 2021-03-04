@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .phrases import BOT_PHRASES
 
 GOTO = {
@@ -31,3 +33,40 @@ GOTO = {
 }
 # in: hey? out: [CROWLING AND SCREAMING]:
 DEFAULT = BOT_PHRASES.get('recommend_main'), BOT_PHRASES.get('recommend_default')
+
+# -----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------
+
+Logic = Enum('Logic', 'HANGUP HELLO MAIN', start=0)
+
+# В `goto` добавлены перечисления, на основе которых будут определяться следующие действия бота
+goto_alternative = {
+    'null': {
+        1: (BOT_PHRASES.get('hello_null'), Logic.HELLO.value),
+        2: (BOT_PHRASES.get('recommend_null'), Logic.MAIN.value),
+        None: (BOT_PHRASES.get('hangup_null'), Logic.HANGUP.value),
+    },
+    'да': {
+        1: (BOT_PHRASES.get('recommend_main'), Logic.MAIN.value),
+        2: (BOT_PHRASES.get('recommend_score_positive'), Logic.MAIN.value),
+    },
+    'нет': {
+        1: (BOT_PHRASES.get('hangup_wrong_time'), Logic.HANGUP.value),
+        2: (BOT_PHRASES.get('recommend_score_negative'), Logic.MAIN.value),
+    },
+    'занят': (BOT_PHRASES.get('hangup_wrong_time'), Logic.HANGUP.value),
+    'не знаю': (BOT_PHRASES.get('recommend_repeat_2'), Logic.MAIN.value),
+    'возможно': (BOT_PHRASES.get('recommend_score_neutral'), Logic.MAIN.value),
+    'еще раз': {
+        1: (BOT_PHRASES.get('hello_repeat'), Logic.HELLO.value),
+        2: (BOT_PHRASES.get('recommend_repeat'), Logic.MAIN.value),
+    },
+    '?': (BOT_PHRASES.get('forward'), Logic.MAIN.value),  # nlu
+    'bad': (BOT_PHRASES.get('hangup_negative'), Logic.HANGUP.value),
+    'good': (BOT_PHRASES.get('hangup_positive'), Logic.HANGUP.value),
+    'default': {
+        1: (BOT_PHRASES.get('recommend_main'), Logic.MAIN.value),
+        2: (BOT_PHRASES.get('recommend_default'), Logic.MAIN.value),
+    }
+}

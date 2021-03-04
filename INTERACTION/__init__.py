@@ -1,6 +1,8 @@
 from collections import namedtuple
 
-from .goto import GOTO, DEFAULT, BOT_PHRASES
+from .goto import (
+    GOTO, DEFAULT, BOT_PHRASES, Logic, goto_alternative as goto
+)
 
 Interaction = namedtuple('Interaction', 'bot_phrases goto default')
 
