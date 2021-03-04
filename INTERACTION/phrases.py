@@ -1,6 +1,4 @@
 import re
-from collections import namedtuple
-
 
 pattern = r'((?!\n)\s+)'
 
@@ -74,54 +72,3 @@ BOT_PHRASES = {
             "повторите пожалуйста"
 
 }
-
-
-
-GOTO = {
-    'null': {
-        'hello_null': BOT_PHRASES.get('hello_null'),
-        'recommend_nul': BOT_PHRASES.get('recommend_null'), 
-        'hangup_null': BOT_PHRASES.get('hangup_null')
-    },
-    'да': {
-        'recommend_main': BOT_PHRASES.get('recommend_main'),
-        'recommend_score_positive': BOT_PHRASES.get('recommend_score_positive')
-    },
-    'нет': {
-        'hangup_wrong_time': BOT_PHRASES.get('hangup_wrong_time'),
-        'recommend_score_negative': BOT_PHRASES.get('recommend_score_negative')
-    },
-    'занят': BOT_PHRASES.get('hangup_wrong_time'),
-    'не знаю': BOT_PHRASES.get('recommend_repeat_2'),
-    'возможно': BOT_PHRASES.get('recommend_score_neutral'),
-    'еще раз': {
-        'hello_repeat': BOT_PHRASES.get('hello_repeat'), 
-        'recommend_repeat': BOT_PHRASES.get('recommend_repeat')
-    },
-    '?': BOT_PHRASES.get('forward'),
-    'bad': BOT_PHRASES.get('hangup_negative'),
-    'good': BOT_PHRASES.get('hangup_positive'),
-    'exit': [
-        'hangup_null', 'hangup_positive',
-        'hangup_negative','занят',
-    ]
-}
-# in: hey? out: [CROWLING AND SCREAMING]:
-DEFAULT = BOT_PHRASES.get('recommend_main'), BOT_PHRASES.get('recommend_default')
-
-
-Interaction = namedtuple('Interaction', 'bot_phrases goto default')
-
-Interaction.__doc__ += ': Interactions between machine and human'
-Interaction.bot_phrases.__doc__ = 'Speech set for a robot'
-Interaction.goto.__doc__ = 'User behavior patterns and bot reaction to them'
-Interaction.default.__doc__ = 'Default behavior of the robot'
-
-interaction = Interaction(BOT_PHRASES, GOTO, DEFAULT)
-
-
-if __name__ == '__main__':
-    
-    for field in interaction._fields:
-        doc = getattr(Interaction, field)
-        print(f'Interaction.{field}.__doc__ : {doc.__doc__}')

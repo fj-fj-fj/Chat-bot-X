@@ -1,8 +1,7 @@
 import sys
 
-from phrases import interaction
+from INTERACTION import interaction
 from utils import time_input
-
 
 _, goto, default = interaction
 

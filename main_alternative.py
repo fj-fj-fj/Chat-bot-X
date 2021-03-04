@@ -19,7 +19,7 @@
 import sys
 from enum import Enum
 
-from phrases import interaction
+from INTERACTION import interaction
 from utils import time_input, set_utf8_if_cp
 
 
