@@ -1,7 +1,6 @@
 import traceback
 import builtins
 import inspect
-import msvcrt
 import time
 import sys
 
@@ -12,24 +11,39 @@ def set_utf8_if_cp():
         sys.stdout.reconfigure(encoding='utf-8')
 
 
-def time_input(caption, timeout=7):
-    """input() with a lifespan of 5 seconds"""
-    def echo(c):
-        sys.stdout.write(c)
+try:
+    import msvcrt
+
+    def time_input(caption, timeout=7):
+        """input() with a lifespan of 5 seconds"""
+        def echo(c):
+            sys.stdout.write(c)
+            sys.stdout.flush()
+        echo(caption)
+        _input = []
+        start = time.monotonic()
+        while time.monotonic() - start < timeout:
+            if msvcrt.kbhit():
+                c = msvcrt.getwch()
+                if ord(c) == 13:
+                    echo('\r\n')
+                    break
+                _input.append(c)
+                echo(c)
+        if _input:
+            return ''.join(_input)
+
+except ModuleNotFoundError:
+    import select
+
+    def time_input(prompt, timeout=7):
+        sys.stdout.write(prompt)
         sys.stdout.flush()
-    echo(caption)
-    _input = []
-    start = time.monotonic()
-    while time.monotonic() - start < timeout:
-        if msvcrt.kbhit():
-            c = msvcrt.getwch()
-            if ord(c) == 13:
-                echo('\r\n')
-                break
-            _input.append(c)
-            echo(c)
-    if _input:
-        return ''.join(_input)
+        ready, _, _ = select.select([sys.stdin], [], [], timeout)
+        if ready:
+            # expect stdin to be line-buffered
+            return sys.stdin.readline().rstrip('\n')
+        # raise TimeoutExpired
 
 
 def print(*args, **kwargs):
