@@ -5,7 +5,7 @@ from .phrases import BOT_PHRASES
 GOTO = {
     'null': {
         'hello_null': BOT_PHRASES.get('hello_null'),
-        'recommend_nul': BOT_PHRASES.get('recommend_null'), 
+        'recommend_nul': BOT_PHRASES.get('recommend_null'),
         'hangup_null': BOT_PHRASES.get('hangup_null')
     },
     'да': {
@@ -20,7 +20,7 @@ GOTO = {
     'не знаю': BOT_PHRASES.get('recommend_repeat_2'),
     'возможно': BOT_PHRASES.get('recommend_score_neutral'),
     'еще раз': {
-        'hello_repeat': BOT_PHRASES.get('hello_repeat'), 
+        'hello_repeat': BOT_PHRASES.get('hello_repeat'),
         'recommend_repeat': BOT_PHRASES.get('recommend_repeat')
     },
     '?': BOT_PHRASES.get('forward'),
@@ -28,19 +28,19 @@ GOTO = {
     'good': BOT_PHRASES.get('hangup_positive'),
     'exit': [
         'hangup_null', 'hangup_positive',
-        'hangup_negative','занят',
-    ]
+        'hangup_negative', 'занят',
+    ],
 }
-# in: hey? out: [CROWLING AND SCREAMING]:
-DEFAULT = BOT_PHRASES.get('recommend_main'), BOT_PHRASES.get('recommend_default')
 
-# -----------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------
+# in: hey? out: [CROWLING AND SCREAMING]:
+DEFAULT = BOT_PHRASES.get('recommend_main'), BOT_PHRASES.get('recommend_default')  # noqa: E501
+
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 Logic = Enum('Logic', 'HANGUP HELLO MAIN', start=0)
 
-# В `goto` добавлены перечисления, на основе которых будут определяться следующие действия бота
 goto_alternative = {
     'null': {
         1: (BOT_PHRASES.get('hello_null'), Logic.HELLO.value),

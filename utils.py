@@ -11,11 +11,12 @@ def set_utf8_if_cp():
     if sys.stdout.encoding == 'cp1251':
         sys.stdout.reconfigure(encoding='utf-8')
 
+
 def time_input(caption, timeout=7):
     """input() with a lifespan of 5 seconds"""
     def echo(c):
         sys.stdout.write(c)
-        sys.stdout.flush()        
+        sys.stdout.flush()
     echo(caption)
     _input = []
     start = time.monotonic()
@@ -30,9 +31,11 @@ def time_input(caption, timeout=7):
     if _input:
         return ''.join(_input)
 
+
 def print(*args, **kwargs):
     """formatted output"""
     builtins.print('\n\a\N{Robot Face}\t>>\t>>>\t', *args, **kwargs)
+
 
 def get_fname():
     current_frame = inspect.currentframe()
@@ -40,15 +43,19 @@ def get_fname():
     current_name = previous_frame.f_code.co_name
     return current_name
 
+
 def i(): print(inspect.stack())
 
+
 def f_name(): return traceback.extract_stack(None, 2)[0][2]
+
 
 log = {
     0: '\n:: Связь установить не удалось; response: {}'.rjust(100, '~'),
     1: '\n:: {} function run',
     2: '\n:: маппинг функций и ответа; response: {}\n'.rjust(100, '~')
 }
+
 
 if __name__ == '__main__':
     pass

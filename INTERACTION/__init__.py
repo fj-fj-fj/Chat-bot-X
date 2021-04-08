@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from .goto import (
+from .goto import (  # noqa: F401
     GOTO, DEFAULT, BOT_PHRASES, Logic, goto_alternative as goto
 )
 

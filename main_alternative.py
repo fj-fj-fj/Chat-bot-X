@@ -1,21 +1,7 @@
-"""This module is an alternative to the `main` module. The essence is the same.
-    
-    import:
-    1. Enum: Logic - bot next action pointers
-    2. phrases.interaction.bot_phrases - bot behavior patterns
-       contains:
-          hello_* : the logic of starting a conversation with a person
-          recommend_* : base logic (clarification of service quality assessment)
-          hangup_* : conversation termination logic
-    3. utils.time_input - input() with a lifespan of 5 seconds
-    4. utils.set_utf8_if_cp - set utf-8 if cp1251 is default
-    
-    goto.keys() - human behavior patterns
-    goto.values() - typles: (bot pattern, the next step for the bot), (), () ...
-    func: chat - processes the human response
-        
 """
+This module is an alternative to the `main` module. The essence is the same.
 
+"""
 import sys
 
 from INTERACTION import BOT_PHRASES, Logic, goto
@@ -35,14 +21,6 @@ def say_hello(name):
 
 
 def chat(response):
-    """Processes the human response.
-
-    response is None - human ignores
-    response.isdigit and logic.MAIN - assesses the quality of service
-    response not in goto.keys - the answer is incomprehensible
-    for key in goto - other behavior patterns
-
-    """
     global logic, repeat
 
     if response is None:
@@ -88,6 +66,6 @@ def main():
     while True:
         response = chat(response)
 
+
 if __name__ == '__main__':
     main()
- 
